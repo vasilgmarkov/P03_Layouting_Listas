@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -23,8 +24,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
-    String[] items ={"1:Cireres:Cireres vermelles:1.56:img000.jpg",
+    ArrayList<Producto> listProductos = new ArrayList<>();
+    ArrayAdapter<Producto> listAdapter;
+    String[] items ={"1:Cireres:Cireres vermelles:1.56:img000",
             "2:Plàtan:Plàtan boníssim:0.15:img001.jpg",
             "3:Pastís:Pastís d'aniversari:12.99:img002.jpg",
             "4:Barra de pa:De la nostra fleca:0.42:img003.jpg",
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ArrayList<Producto> stock = new ArrayList<>();
+
            for (int i=0;i<items.length;i++){
             String[] item = items[i].split(":");
             Producto producto = new Producto();
@@ -66,13 +69,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             producto.name=item[1];
             producto.info=item[2];
             producto.price=Double.parseDouble(item[3]);
-            producto.img=Uri.parse(item[4]);
+            producto.img=item[4];
             stock.add(producto);
 
         }
 
-        Spinner spiner = (Spinner) findViewById(R.id.spinner);
-        spiner.setAdapter(new ContactAdapter(this,stock));
+        final Spinner spiner = (Spinner) findViewById(R.id.spinner);
+        final ListView listview = (ListView) findViewById(R.id.listView);
+
+        spiner.setAdapter(new ContactAdapter(this, stock));
+        spiner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Producto pos =(Producto) spiner.getItemAtPosition(position);
+                listProductos.add(pos);
+            //    listAdapter.notifyDataSetChanged();
+
+
+
+
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        listview.setAdapter(new ContactAdapter1(this,listProductos));
         }
 
     @Override
@@ -86,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public String name;
         public String info;
         public double price;
-        public Uri img;
+        public String img;
 
     }
 
@@ -134,6 +159,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    private class ViewInfo1 {
+        TextView nombre, precio;
+        ImageView img;
+        Producto contact;
+
+        public ViewInfo1(View view) {
+            nombre = (TextView) view.findViewById(R.id.textView1);
+            precio = (TextView) view.findViewById(R.id.textView2);
+            img = (ImageView) view.findViewById(R.id.imageView);
+
+        }
+
+        public void setContact1(Producto contact) {
+            this.contact = contact;
+            nombre.setText(contact.name);
+            precio.setText(Double.toString(contact.price));
+            img.setImageResource(getResources().getIdentifier(contact.img, "drawable", MainActivity.this.getPackageName()));
+
+        }
+    }
+
 
 
     private class ContactAdapter extends BaseAdapter {
@@ -163,6 +209,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Producto contact = contacts.get(position);
             viewInfo.setContact(contact);
            // view.setOnClickListener(MainActivity.this);
+            return view;
+        }
+
+
+    }
+
+    private class ContactAdapter1 extends BaseAdapter {
+        private Context context;
+        private ArrayList<Producto> contacts;
+
+        public ContactAdapter1(Context context, ArrayList<Producto> contacts) {
+            this.context = context;
+            this.contacts = contacts;
+        }
+
+        @Override
+        public int getCount() { return contacts.size(); }
+        @Override public Object getItem(int position) { return contacts.get(position); }
+        @Override public long getItemId(int position) { return position; }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null) {
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(
+                        Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.item_list, parent, false);
+                ViewInfo1 viewInfo = new ViewInfo1(view);
+                view.setTag(viewInfo);
+            }
+            ViewInfo1 viewInfo = (ViewInfo1) view.getTag();
+            Producto contact = contacts.get(position);
+            viewInfo.setContact1(contact);
+            // view.setOnClickListener(MainActivity.this);
             return view;
         }
 
