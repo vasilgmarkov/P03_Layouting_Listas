@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Producto pos =(Producto) spiner.getItemAtPosition(position);
                 listProductos.add(pos);
-            //    listAdapter.notifyDataSetChanged();
+             listAdapter.notifyDataSetChanged();
 
 
 
